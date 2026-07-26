@@ -2,6 +2,7 @@
 
 > A validation pipeline that gates AI-generated code and infrastructure before it ships. LLM output is security-scanned (OPA), functionally tested (Selenium + PyTest), scored for trust, and, when it fails, automatically re-prompted and fixed until it passes.
 
+[![CI](https://github.com/codebyanjaneya/LLM-Gate/actions/workflows/ci.yml/badge.svg)](https://github.com/codebyanjaneya/LLM-Gate/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
 ![Terraform](https://img.shields.io/badge/Terraform-5.x-7B42BC?logo=terraform&logoColor=white)
 ![Open Policy Agent](https://img.shields.io/badge/OPA-Rego-566DE8?logo=openpolicyagent&logoColor=white)

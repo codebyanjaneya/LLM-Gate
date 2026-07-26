@@ -1,0 +1,83 @@
+# CI for LLM-Gate.
+#
+# Two jobs, split by intent:
+#   validate      - syntax/validation checks that must always pass (green).
+#   security-scan - runs the OPA policy gate, which is EXPECTED to report
+#                   findings because infra/main.tf is intentionally insecure
+#                   for the demo. That step is allow-fail (continue-on-error)
+#                   so it surfaces the findings without failing the workflow.
+#
+# The Selenium + PyTest functional tests need a live Flask app and a browser,
+# so CI only validates that the test suite collects; it does not run them.
+
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    name: Syntax and validation (must pass)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install OPA
+        run: |
+          curl -fsSL -o opa https://openpolicyagent.org/downloads/latest/opa_linux_amd64_static
+          chmod +x opa
+          sudo mv opa /usr/local/bin/opa
+          opa version
+
+      - name: Validate Rego policy syntax (opa check)
+        run: opa check policies/main.rego
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform init and validate
+        run: |
+          terraform -chdir=infra init -input=false -backend=false
+          terraform -chdir=infra validate
+
+      - name: Validate the test suite collects (browser/app not needed)
+        run: pytest --collect-only -q
+
+  security-scan:
+    name: OPA security gate (demo findings expected)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install OPA
+        run: |
+          curl -fsSL -o opa https://openpolicyagent.org/downloads/latest/opa_linux_amd64_static
+          chmod +x opa
+          sudo mv opa /usr/local/bin/opa
+
+      - name: Run the OPA policy gate against the sample plan
+        continue-on-error: true
+        run: |
+          echo "infra/main.tf intentionally contains insecure demo config."
+          echo "The gate is EXPECTED to report findings and exit non-zero."
+          python policies/run_check.py --plan-json policies/sample_plan.json

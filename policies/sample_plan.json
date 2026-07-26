@@ -1,0 +1,52 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.9.0",
+  "planned_values": {
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_security_group.app_sg",
+          "type": "aws_security_group",
+          "name": "app_sg",
+          "values": {
+            "name": "llm-gate-demo-sg",
+            "ingress": [
+              {
+                "from_port": 0,
+                "to_port": 0,
+                "protocol": "-1",
+                "cidr_blocks": ["0.0.0.0/0"]
+              }
+            ],
+            "egress": [
+              {
+                "from_port": 0,
+                "to_port": 0,
+                "protocol": "-1",
+                "cidr_blocks": ["0.0.0.0/0"]
+              }
+            ]
+          }
+        },
+        {
+          "address": "aws_instance.app_server",
+          "type": "aws_instance",
+          "name": "app_server",
+          "values": {
+            "instance_type": "t2.micro",
+            "root_block_device": [
+              {
+                "volume_size": 8,
+                "encrypted": false
+              }
+            ],
+            "tags": {
+              "Name": "llm-gate-demo-app",
+              "Project": "llm-gate"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
