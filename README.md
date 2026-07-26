@@ -1,7 +1,6 @@
-# 🛡️ LLM-Gate
+# LLM-Gate
 
-> **A validation pipeline that gates AI-generated code & infrastructure before it ships.**
-> LLM output is security-scanned (OPA), functionally tested (Selenium + PyTest), scored for trust, and — when it fails — automatically re-prompted and fixed until it passes.
+> A validation pipeline that gates AI-generated code and infrastructure before it ships. LLM output is security-scanned (OPA), functionally tested (Selenium + PyTest), scored for trust, and, when it fails, automatically re-prompted and fixed until it passes.
 
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
 ![Terraform](https://img.shields.io/badge/Terraform-5.x-7B42BC?logo=terraform&logoColor=white)
@@ -10,11 +9,11 @@
 
 ---
 
-## 🎯 The Problem
+## The Problem
 
-Developers increasingly ship application code and Terraform straight from LLMs (Claude, GPT, Copilot) with minimal review. This "vibe-coded" output regularly hides security gaps — `0.0.0.0/0` security groups, unencrypted volumes, public S3 buckets, over-permissive IAM — and untested functionality that only surfaces during a production incident. **LLM-Gate sits between AI output and deployment as a guardrail: it proves the infrastructure is secure and the app actually works _before_ anything goes live.**
+Developers increasingly ship application code and Terraform straight from LLMs (Claude, GPT, Copilot) with minimal review. This "vibe-coded" output regularly hides security gaps such as `0.0.0.0/0` security groups, unencrypted volumes, public S3 buckets, and over-permissive IAM, plus untested functionality that only surfaces during a production incident. LLM-Gate sits between AI output and deployment as a guardrail: it proves the infrastructure is secure and the app actually works before anything goes live.
 
-## ⚙️ What It Does
+## What It Does
 
 ```mermaid
 flowchart LR
@@ -29,35 +28,35 @@ flowchart LR
     F --> H([Validated output])
 ```
 
-Every stage is genuinely interdependent — not a set of isolated demos. Any failure at the security gate or the functional tests is packaged into a structured fix prompt and sent back to the LLM, which regenerates the offending files. The loop repeats until the trust score hits **100%** or the retry budget runs out.
+Every stage is interdependent, not a set of isolated demos. Any failure at the security gate or the functional tests is packaged into a structured fix prompt and sent back to the LLM, which regenerates the offending files. The loop repeats until the trust score hits 100% or the retry budget runs out.
 
-## ✨ Key Features
+## Key Features
 
-- 🔒 **5 OPA security policies** — Rego rules that scan the Terraform plan for open security groups, unencrypted root volumes, missing resource tags, public S3 ACLs, and SSH exposed to the world.
-- 🧪 **7 functional tests** — Selenium + PyTest covering login, auth redirects, session handling, page rendering, and a security test that catches an exposed Werkzeug debugger (`debug=True`).
-- ♻️ **Self-correcting auto-fix loop** — failures become a fix prompt for a Groq-hosted Llama 3.3 70B model that rewrites the files. Invalid Terraform (e.g. a placeholder CIDR) is caught by `terraform validate` and fed back so the LLM **corrects its own mistake** on the next attempt.
-- 📊 **Trust score system** — `(passing checks / total checks) × 100`, written to a JSON report with a full pass/fail breakdown and per-run score history.
-- 🧱 **Safe by design** — LLM writes are restricted to an allowlist (path-traversal guard), originals are backed up before every overwrite, and secrets stay in a gitignored `.env`.
+- **5 OPA security policies:** Rego rules that scan the Terraform plan for open security groups, unencrypted root volumes, missing resource tags, public S3 ACLs, and SSH exposed to the world.
+- **7 functional tests:** Selenium + PyTest covering login, auth redirects, session handling, page rendering, and a security test that catches an exposed Werkzeug debugger (`debug=True`).
+- **Self-correcting auto-fix loop:** failures become a fix prompt for a Groq-hosted Llama 3.3 70B model that rewrites the files. Invalid Terraform (for example a placeholder CIDR) is caught by `terraform validate` and fed back so the LLM corrects its own mistake on the next attempt.
+- **Trust score system:** `(passing checks / total checks) * 100`, written to a JSON report with a full pass/fail breakdown and per-run score history.
+- **Safe by design:** LLM writes are restricted to an allowlist (path-traversal guard), originals are backed up before every overwrite, and secrets stay in a gitignored `.env`.
 
-## 🧰 Tech Stack
+## Tech Stack
 
 | Tool | Role in the pipeline |
 |------|----------------------|
 | **Terraform** | Provisions the AI-generated infrastructure |
 | **OPA / Rego** | Policy-as-code security gate on the Terraform plan |
 | **Selenium** | Browser automation for functional tests |
-| **PyTest** | Test runner + machine-readable JSON reporting |
-| **Groq (Llama 3.3 70B)** | LLM that generates and auto-fixes the code/infra |
+| **PyTest** | Test runner and machine-readable JSON reporting |
+| **Groq (Llama 3.3 70B)** | LLM that generates and auto-fixes the code and infra |
 | **Flask** | Sample application under test |
 | **Python** | Orchestration and glue between every stage |
 
-## 🎬 Demo
+## Demo
 
 <!-- TODO: replace with a terminal recording GIF -->
 <!-- ![LLM-Gate demo](docs/demo.gif) -->
 _A terminal recording will go here._
 
-Real run — the LLM's first fix produced an **invalid CIDR placeholder**, the pipeline caught it, fed the terraform error back, and the model self-corrected to reach a perfect trust score:
+Real run: the LLM's first fix produced an invalid CIDR placeholder, the pipeline caught it, fed the terraform error back, and the model self-corrected to reach a perfect trust score.
 
 ```text
 $ python orchestrator.py --max-retries 3
@@ -82,16 +81,16 @@ AUTO-FIX ATTEMPT 2/3  ->  (previous terraform error included in the prompt)
 ============================================================
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
-**Prerequisites:** Python 3.11+, [Terraform](https://developer.hashicorp.com/terraform/install), [OPA](https://www.openpolicyagent.org/docs/latest/#running-opa), and Google Chrome (for Selenium). A [Groq API key](https://console.groq.com/keys) is optional — without it the pipeline runs in **detect-only** mode.
+Prerequisites: Python 3.11+, [Terraform](https://developer.hashicorp.com/terraform/install), [OPA](https://www.openpolicyagent.org/docs/latest/#running-opa), and Google Chrome (for Selenium). A [Groq API key](https://console.groq.com/keys) is optional; without it the pipeline runs in detect-only mode.
 
 ```bash
 # 1. Clone
 git clone https://github.com/codebyanjaneya/LLM-Gate.git
 cd LLM-Gate
 
-# 2. Create + activate a virtual environment
+# 2. Create and activate a virtual environment
 python -m venv venv
 venv\Scripts\activate          # Windows
 # source venv/bin/activate     # macOS / Linux
@@ -117,7 +116,7 @@ python policies/run_check.py                  # just the OPA security gate
 pytest -m security                            # just the security test
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 LLM-Gate/
@@ -144,19 +143,19 @@ LLM-Gate/
 └── README.md
 ```
 
-## 💡 Why This Project Is Interesting
+## Why This Project Is Interesting
 
-Most tools _generate_ code with AI; LLM-Gate uses one AI system to **validate and repair the output of another** — a fresh, largely unexplored angle. The genuinely novel part is the closed feedback loop: when the model emits code that is insecure, non-functional, or even syntactically invalid, the exact failure (an OPA violation, a failing test, or a real `terraform validate` error) is routed back into the next prompt so the model can self-correct — with a measurable **trust score** proving whether it worked.
+Most tools generate code with AI. LLM-Gate uses one AI system to validate and repair the output of another, a fresh and largely unexplored angle. The novel part is the closed feedback loop: when the model emits code that is insecure, non-functional, or even syntactically invalid, the exact failure (an OPA violation, a failing test, or a real `terraform validate` error) is routed back into the next prompt so the model can self-correct, with a measurable trust score proving whether it worked.
 
-## 🗺️ Roadmap
+## Roadmap
 
 - [ ] Package as an installable `llm-gate` CLI (pipx)
 - [ ] VS Code extension to gate AI output inline before commit
-- [ ] More OPA policies (IAM least-privilege, public S3, tagging & cost guards)
+- [ ] More OPA policies (IAM least-privilege, public S3, tagging and cost guards)
 - [ ] LocalStack / Docker path for a zero-cloud demo
 - [ ] Pluggable LLM providers (OpenAI, Claude, local models)
 - [ ] GitHub Action to run the gate in CI
 
-## 📄 License
+## License
 
 Released under the [MIT License](LICENSE).
