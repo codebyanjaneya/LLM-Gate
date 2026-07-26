@@ -1,0 +1,9 @@
+# LLM-Gate - Python dependencies (keep minimal for the demo)
+flask      # the sample app under test (generator/sample_app.py)
+selenium   # browser automation for functional tests
+pytest     # test runner + reporting
+requests   # lightweight HTTP checks in tests / pipeline glue
+webdriver-manager  # auto-installs a matching chromedriver for Selenium
+pytest-json-report # machine-readable pytest results for the feedback loop
+groq               # LLM API client for the auto-fix loop
+python-dotenv      # loads GROQ_API_KEY from a local .env file

@@ -1,0 +1,71 @@
+{
+  "timestamp": "2026-07-26T05:36:45.593216+00:00",
+  "trust_score": 100.0,
+  "breakdown": {
+    "opa_passed": 5,
+    "opa_failed": 0,
+    "pytest_passed": 7,
+    "pytest_failed": 0,
+    "total_checks": 12,
+    "total_passed": 12
+  },
+  "opa_results": {
+    "deny_open_security_group": {
+      "passed": true,
+      "messages": []
+    },
+    "deny_unencrypted_volume": {
+      "passed": true,
+      "messages": []
+    },
+    "deny_missing_tags": {
+      "passed": true,
+      "messages": []
+    },
+    "deny_public_s3": {
+      "passed": true,
+      "messages": []
+    },
+    "deny_ssh_open_to_world": {
+      "passed": true,
+      "messages": []
+    }
+  },
+  "pytest_results": [
+    {
+      "nodeid": "tests/test_app.py::test_home_redirects_to_login_when_not_authenticated",
+      "outcome": "passed",
+      "message": ""
+    },
+    {
+      "nodeid": "tests/test_app.py::test_login_page_loads",
+      "outcome": "passed",
+      "message": ""
+    },
+    {
+      "nodeid": "tests/test_app.py::test_login_with_valid_credentials",
+      "outcome": "passed",
+      "message": ""
+    },
+    {
+      "nodeid": "tests/test_app.py::test_login_with_invalid_credentials",
+      "outcome": "passed",
+      "message": ""
+    },
+    {
+      "nodeid": "tests/test_app.py::test_logout_clears_session",
+      "outcome": "passed",
+      "message": ""
+    },
+    {
+      "nodeid": "tests/test_app.py::test_debug_mode_disabled",
+      "outcome": "passed",
+      "message": ""
+    },
+    {
+      "nodeid": "tests/test_app.py::test_home_page_title",
+      "outcome": "passed",
+      "message": ""
+    }
+  ]
+}

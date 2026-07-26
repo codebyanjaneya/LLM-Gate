@@ -1,0 +1,12 @@
+The following issues were found in AI-generated output:
+
+[SECURITY] Terraform policy violations (infra/main.tf):
+  - Security group 'aws_security_group.app_sg' has an egress rule open to the world (0.0.0.0/0)
+  - Security group 'aws_security_group.app_sg' has an ingress rule open to the world (0.0.0.0/0)
+  - Instance 'aws_instance.app_server' has an unencrypted root_block_device (encrypted = false)
+  - Security group 'aws_security_group.app_sg' exposes SSH (port 22) to the world (0.0.0.0/0)
+
+[FUNCTIONAL] Failing tests (generator/sample_app.py):
+  - tests/test_app.py::test_debug_mode_disabled: AssertionError: Werkzeug interactive debugger is exposed (['Werkzeug Debugger', 'Traceback (most recent call last)']). Flask is running with debug=True - a remote-code-execution risk. Disable debug before deploy.
+
+Fix these issues in the relevant files: infra/main.tf and/or generator/sample_app.py. Return only the corrected file contents.
